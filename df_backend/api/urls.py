@@ -8,6 +8,7 @@ router.register('races', views.RaceViewSet)
 router.register('professions', views.ProfessionViewSet)
 router.register('factions', views.FactionViewSet)
 router.register('entities', views.EntityViewSet)
+router.register('names', views.NamePartViewSet)
 
 urlpatterns = [
     path(r'', include(router.urls)),

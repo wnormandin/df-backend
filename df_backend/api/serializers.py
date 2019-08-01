@@ -46,6 +46,12 @@ class UserSerializer(serializers.ModelSerializer):
         exclude = ['password']
 
 
+class NamePartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.NamePart
+        fields = '__all__'
+
+
 class RaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.EntityRace

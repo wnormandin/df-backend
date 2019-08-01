@@ -13,5 +13,9 @@ SMTP_USER = os.environ.get('DF_SMTP_USER', None)
 SMTP_PASS = os.environ.get('DF_SMTP_PASS', None)
 SMTP_PORT = os.environ.get('DF_SMTP_PORT', None)
 
-# Email archive settings
-EMAIL_ARCHIVE_PATH = os.environ.get('DF_EMAIL_ARCHIVE', os.path.expanduser('~/df_outbound_mail'))
+
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')
+EMAIL_DATA_DIR = os.path.join(DATA_DIR, 'email')
+LOG_DATA_DIR = os.path.join(DATA_DIR, 'logs')
+LOG_LEVEL = int(os.environ.get('DF_LOG_LEVEL', 10))
+GENDER_CHOICES = [('male', 'Male'), ('female', 'Female'), ('neutral', 'Neutral')]

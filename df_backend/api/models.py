@@ -2,9 +2,35 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
 import logging
+import random
 
+from ..utils.constants import GENDER_CHOICES
 
 logger = logging.getLogger(__name__)
+
+
+class NamePart(models.Model):
+    value = models.CharField(max_length=15)
+    paternal = models.BooleanField(default=False)
+    maternal = models.BooleanField(default=False)
+    prefix = models.BooleanField(default=False)
+    suffix = models.BooleanField(default=False)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default='neutral')
+
+    @classmethod
+    def get_part(cls, target=None, gender='neutral'):
+        filter_kwargs = dict(paternal=False, maternal=False, prefix=False, suffix=False)
+        filter_kwargs['gender__in'] = {gender, 'neutral'}
+
+        if target is not None:
+            filter_kwargs[target] = True
+        if target == 'paternal':
+            filter_kwargs.pop('maternal')
+        elif target == 'maternal':
+            filter_kwargs.pop('paternal')
+
+        targets = cls.objects.filter(**filter_kwargs).all()
+        return random.choice(list(targets)) if targets else None
 
 
 class Game(models.Model):
@@ -23,12 +49,19 @@ class GameEntity(models.Model):
     level = models.IntegerField(default=1)
     alive = models.BooleanField(default=True)
     active = models.BooleanField(default=True)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default='neutral')
 
     profession = models.ForeignKey('EntityProfession', models.DO_NOTHING)
     race = models.ForeignKey('EntityRace', models.DO_NOTHING)
     stats = models.ForeignKey('EntityStats', models.DO_NOTHING)
     location = models.ForeignKey('EntityLocation', models.DO_NOTHING)
     game_map = models.ForeignKey(GameMap, models.DO_NOTHING)
+
+    @classmethod
+    def get_random(cls):
+        """ Returns a randomly generated entity without restrictions """
+
+        entity = cls()
 
     def get_faction_scores(self):
         output = {}
