@@ -5,13 +5,15 @@ setup(
     name="df_backend",
     version=__version__,
     install_requires=[
+        'click',
         'django',
         'django-rest-framework',
-        'django-waitress'
+        'waitress'
         ],
     author='William Normandin',
     author_email='bill@pokeybill.us',
     packages=find_packages(),
     license='MIT',
-    description='Backend API for the DunderFunk game client'
+    description='Backend API for the DunderFunk game client',
+    entry_points={'console_scripts': ['df-api=df_backend.cli:cli']}
     )
