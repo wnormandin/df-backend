@@ -5,8 +5,7 @@ import random
 import requests
 from collections import OrderedDict
 
-from ..utils import constants
-from . import models, serializers
+from . import models
 
 
 logger = logging.getLogger(__name__)
@@ -14,6 +13,17 @@ logger = logging.getLogger(__name__)
 
 def roll(d=0.5):
     return random.random() > (1-d)
+
+
+def generate_multiple_names(count, genders=None, max_length=50, max_tries=100):
+    results = []
+    genderset = genders or ['male', 'female']
+    for n in range(0, count):
+        gender = random.choice(genderset)
+        name_ = generate_name(gender=gender, max_length=max_length, max_tries=max_tries)
+        if name_:
+            results.append({'gender': gender, 'name': name_})
+    return results
 
 
 def generate_name(gender, max_length=50, max_tries=100):
@@ -68,5 +78,10 @@ def load_names_from_url(url, max_count=2000, **kwargs):
     return count
 
 
-def generate_entity():
-    pass
+def generate_entity(race, prof):
+    if not isinstance(race, models.EntityRace):
+        race = models.EntityRace.objects.get(name=race)
+    if not isinstance(prof, models.EntityProfession):
+        prof = models.EntityProfession.objects.get(name=prof)
+
+

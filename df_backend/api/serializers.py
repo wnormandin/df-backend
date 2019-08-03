@@ -4,6 +4,11 @@ from django.contrib.auth.models import User
 from . import models
 
 
+class RandomNameRequestSerializer(serializers.Serializer):
+    count = serializers.IntegerField(default=1)
+    genders = serializers.JSONField(required=False)
+
+
 class StatSerializer(serializers.Serializer):
     name = serializers.CharField(required=False, max_length=50)
     description = serializers.CharField(required=False, max_length=1000)

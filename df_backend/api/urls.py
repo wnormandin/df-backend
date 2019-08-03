@@ -1,4 +1,4 @@
-from django.urls import include, path
+from django.urls import include, path, re_path
 from rest_framework import routers
 from . import views
 
@@ -12,6 +12,7 @@ router.register('names', views.NamePartViewSet)
 
 urlpatterns = [
     path(r'', include(router.urls)),
+    re_path(r'generate/names/?(?P<count>\d+)?/?', views.RandomNameGeneration.as_view()),
     path(r'races', views.RaceList.as_view()),
     path(r'professions', views.ProfessionList.as_view()),
     path(r'factions', views.FactionList.as_view()),

@@ -109,7 +109,7 @@ class EntityLocation(models.Model):
 class ProfessionRace(models.Model):
     profession = models.ForeignKey('EntityProfession', models.DO_NOTHING,
                                    related_name='races')
-    race = models.ForeignKey('EntityRace', models.DO_NOTHING)
+    race = models.ForeignKey('EntityRace', models.DO_NOTHING, related_name='professions')
 
     class Meta:
         unique_together = [['profession', 'race']]
@@ -130,6 +130,9 @@ class EntityRace(models.Model):
     description = models.CharField(max_length=1000)
 
     stats = models.ForeignKey('StatModifiers', models.DO_NOTHING)
+
+    def allowed_professions(self):
+        return [rel.profession for rel in self.professions.get()]
 
 
 class FactionScore(models.Model):

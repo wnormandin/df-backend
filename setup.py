@@ -7,7 +7,9 @@ setup(
     install_requires=[
         'click',
         'django',
-        'django-rest-framework',
+        'djangorestframework',
+        'django-filter',
+        'markdown',
         'requests',
         'waitress'
         ],
