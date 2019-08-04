@@ -15,6 +15,9 @@ class NameDomain(models.Model):
     name = models.CharField(max_length=15, unique=True)
     description = models.CharField(max_length=1000)
 
+    def __str__(self):
+        return self.name.title()
+
 
 class NameLanguage(models.Model):
     """ Etymological name language """
@@ -22,12 +25,18 @@ class NameLanguage(models.Model):
     name = models.CharField(max_length=25, unique=True)
     description = models.CharField(max_length=1000)
 
+    def __str__(self):
+        return self.name.title()
+
 
 class NameEra(models.Model):
     name = models.CharField(max_length=15, unique=True)
     description = models.CharField(max_length=1000)
 
     domain = models.ForeignKey(NameDomain, models.DO_NOTHING, related_name='eras', null=True)
+
+    def __str__(self):
+        return self.name.title()
 
 
 class NamePart(models.Model):
@@ -70,13 +79,18 @@ class Game(models.Model):
     player = models.ForeignKey(User, models.DO_NOTHING, related_name='games')
     created_at = models.DateTimeField(default=datetime.utcnow)
 
+    def __str__(self):
+        return f'{self.player} game {self.id}'
+
 
 class GameMap(models.Model):
     game = models.ForeignKey(Game, models.DO_NOTHING)
     created_at = models.DateTimeField(default=datetime.utcnow)
 
+    def __str__(self):
+        return f'{self.game} map {self.id}'
 
-# Create your models here.
+
 class GameEntity(models.Model):
     name = models.CharField(max_length=50)
     level = models.IntegerField(default=1)
@@ -93,6 +107,9 @@ class GameEntity(models.Model):
     @classmethod
     def generate_entity(cls, name, gender, race, profession):
         entity = cls.objects.create(name=name, gender=gender)
+
+    def __str__(self):
+        return f'{self.name.title()} (lvl {self.level} {self.race} {self.profession})'
 
     def get_faction_scores(self):
         output = {}
@@ -136,6 +153,9 @@ class EntityLocation(models.Model):
     def position(self):
         return self.x, self.y, self.z
 
+    def __str__(self):
+        return f'({self.x},{self.y},{self.z})'
+
 
 class ProfessionRace(models.Model):
     profession = models.ForeignKey('EntityProfession', models.DO_NOTHING,
@@ -152,6 +172,9 @@ class EntityProfession(models.Model):
 
     stats = models.ForeignKey('StatModifiers', models.DO_NOTHING)
 
+    def __str__(self):
+        return self.name.title()
+
     def allowed_races(self):
         return [rel.race for rel in self.races.get()]
 
@@ -161,6 +184,9 @@ class EntityRace(models.Model):
     description = models.CharField(max_length=1000)
 
     stats = models.ForeignKey('StatModifiers', models.DO_NOTHING)
+
+    def __str__(self):
+        return self.name.title()
 
     def allowed_professions(self):
         return [rel.profession for rel in self.professions.get()]
@@ -178,6 +204,9 @@ class FactionScore(models.Model):
 class EntityFaction(models.Model):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=1000)
+
+    def __str__(self):
+        return self.name.title()
 
 
 class EntityStats(models.Model):
@@ -267,3 +296,6 @@ class StatModifiers(models.Model):
     def serialize(self):
         from . import serializers
         return serializers.StatSerializer(self).data
+
+    def __str__(self):
+        return self.name.title()

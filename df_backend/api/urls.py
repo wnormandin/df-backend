@@ -27,6 +27,7 @@ generate_patterns = [
 
 urlpatterns = [
     path(r'', include(router.urls)),
+    path(r'register', views.RegisterUser.as_view()),
     path(r'races', views.RaceList.as_view()),
     path(r'professions', views.ProfessionList.as_view()),
     path(r'factions', views.FactionList.as_view()),
