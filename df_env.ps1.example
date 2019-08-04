@@ -1,4 +1,4 @@
-. .venv\Scripts\Activate.ps1
+. <path_to_venv_activate>
 $env:DF_DB_HOST=<db_host>
 $env:DF_DB_NAME=df_backend
 $env:DF_DB_PORT=3306
