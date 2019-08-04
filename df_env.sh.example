@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. /.venv/scripts/activate
+. ./.venv/scripts/activate
 export DF_DB_HOST=<db_host>
 export DF_DB_NAME=df_backend
 export DF_DB_PORT=3306
