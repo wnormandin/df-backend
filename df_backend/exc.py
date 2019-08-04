@@ -13,3 +13,6 @@ class InvalidName(APIException):
     default_code = 'bad_entityname'
 
 
+class InvalidGender(APIException):
+    status_code = 404
+    default_detail = 'A gender provided to the API was not found'

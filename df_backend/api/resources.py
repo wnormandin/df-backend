@@ -6,7 +6,7 @@ import requests
 from collections import OrderedDict
 
 from . import models, serializers
-from ..exc import InvalidProfessionSelection
+from .. import exc
 
 
 logger = logging.getLogger(__name__)
@@ -49,6 +49,12 @@ class NameDescriptor:
         if not parts:
             return
         return '[' + '|'.join(parts) + ']'
+
+
+def register_user(username, password, email, first_name=None, last_name=None):
+    """ Basic user registration, creates a game/game map by default """
+
+
 
 
 def roll(d=0.5):
@@ -118,11 +124,16 @@ def load_names_from_url(url, max_count=2000, **kwargs):
     return count
 
 
-def generate_entity(race, prof):
+def generate_entity(gender, race, prof):
     if not isinstance(race, models.EntityRace):
         race = models.EntityRace.objects.get(name=race)
     if not isinstance(prof, models.EntityProfession):
         prof = models.EntityProfession.objects.get(name=prof)
 
     if prof not in race.allowed_professions():
-        raise InvalidProfessionSelection(f'{race} may not be {prof}')
+        raise exc.InvalidProfessionSelection(f'{race} may not be {prof}')
+
+    if gender not in ('male', 'female'):
+        raise exc.InvalidGender(f'Unknown gender: {gender}')
+
+    entity_name = generate_name(gender=gender)

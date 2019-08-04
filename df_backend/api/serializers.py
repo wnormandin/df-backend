@@ -45,6 +45,31 @@ class StatSerializer(serializers.Serializer):
     addiction = serializers.IntegerField()
 
 
+class NewUserSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=50)
+    password = serializers.CharField(max_length=254)
+    email = serializers.EmailField()
+    first_name = serializers.CharField(max_length=254, required=False)
+    last_name = serializers.CharField(max_length=254, required=False)
+
+
+class NameLanguageSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=254)
+    description = serializers.CharField(max_length=1000)
+
+
+class NameDomainSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=254)
+    description = serializers.CharField(max_length=1000)
+
+
+class NameEraSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=254)
+    description = serializers.CharField(max_length=1000)
+
+    domain = NameDomainSerializer(required=False)
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

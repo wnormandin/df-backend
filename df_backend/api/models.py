@@ -91,10 +91,8 @@ class GameEntity(models.Model):
     game_map = models.ForeignKey(GameMap, models.DO_NOTHING)
 
     @classmethod
-    def get_random(cls):
-        """ Returns a randomly generated entity without restrictions """
-
-        entity = cls()
+    def generate_entity(cls, name, gender, race, profession):
+        entity = cls.objects.create(name=name, gender=gender)
 
     def get_faction_scores(self):
         output = {}
