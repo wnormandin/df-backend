@@ -2,6 +2,7 @@ from django import forms
 from django_select2.forms import Select2MultipleWidget
 
 from ..api import models
+from ..utils import constants
 
 
 class EntityFactionForm(forms.ModelForm):
@@ -60,7 +61,7 @@ class RaceForm(forms.Form):
 class ProfessionForm(forms.Form):
     name = forms.CharField(label='Profession Name', max_length=100)
     description = forms.CharField(label='Profession Description', max_length=1000, widget=forms.Textarea)
-    races = forms.ModelMultipleChoiceField(queryset=models.EntityProfession.objects.all(),
+    races = forms.ModelMultipleChoiceField(queryset=models.EntityRace.objects.all(),
                                            widget=Select2MultipleWidget)
 
 
@@ -89,6 +90,10 @@ class StatForm(forms.Form):
     happiness = forms.IntegerField(label='Happiness', min_value=0, max_value=255)
     addiction = forms.IntegerField(label='Addiction', min_value=0, max_value=255)
 
+    @property
+    def stat_fields(self):
+        return {field: getattr(self.cleaned_data, field) for field in constants.CORE_STATS}
+
 
 class StatModForm(forms.Form):
     food = forms.IntegerField(label='Food modifier', min_value=-100, max_value=100)
@@ -114,12 +119,25 @@ class StatModForm(forms.Form):
     happiness = forms.IntegerField(label='Happiness modifier', min_value=-100, max_value=100)
     addiction = forms.IntegerField(label='Addiction modifier', min_value=-100, max_value=100)
 
+    @property
+    def stat_fields(self):
+        return {field: self.cleaned_data[field] for field in constants.CORE_STATS}
+
 
 class RaceInputForm(RaceForm, StatModForm):
     """ Form encapsulating inputs for a new race """
 
-    def create_race(self):
-        pass
+    def create_race(self, created_by):
+        stat_args = {
+            'name': self.cleaned_data['name'],
+            'description': f'Stat modifiers for Race {self.cleaned_data["name"]}',
+            **self.stat_fields
+        }
+        stat_mods = models.StatModifiers.objects.create(created_by=created_by, **stat_args)
+        return models.EntityRace.objects.create(name=self.cleaned_data['name'],
+                                                description=self.cleaned_data['description'],
+                                                stats=stat_mods,
+                                                created_by=created_by)
 
     def edit_race(self):
         pass
@@ -128,8 +146,17 @@ class RaceInputForm(RaceForm, StatModForm):
 class ProfessionInputForm(ProfessionForm, StatModForm):
     """ Form encapsulating inputs for a new profession """
 
-    def create_profession(self):
-        pass
+    def create_profession(self, created_by):
+        stat_args = {
+            'name': self.cleaned_data['name'],
+            'description': f'Stat modifiers for Profession {self.cleaned_data["name"]}',
+            **self.stat_fields
+        }
+        stat_mods = models.StatModifiers.objects.create(created_by=created_by, **stat_args)
+        return models.EntityProfession.objects.create(name=self.cleaned_data['name'],
+                                                      description=self.cleaned_data['description'],
+                                                      stats=stat_mods,
+                                                      created_by=created_by)
 
     def edit_race(self):
         pass

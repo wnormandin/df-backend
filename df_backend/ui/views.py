@@ -3,7 +3,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
 from django.urls import reverse_lazy
-from django.utils import timezone
+from django.shortcuts import redirect
 
 from ..api import models, serializers
 from . import forms
@@ -40,6 +40,10 @@ class FactionFormView(AutoCreatedByView):
     form_class = forms.EntityFactionForm
     success_url = reverse_lazy('ui_factions')
 
+    def form_valid(self, form):
+        faction = form.create_faction(created_by=self.request.user)
+        return redirect('ui_faction_detail', pk=faction.id)
+
 
 # Profession Views
 class ProfessionDetailView(DetailView):
@@ -57,26 +61,27 @@ class ProfessionInputFormView(AutoCreatedByView):
     success_url = reverse_lazy('ui_professions')
 
     def form_valid(self, form):
-        pass
+        prof = form.create_profession(created_by=self.request.user)
+        return redirect('ui_profession_detail', pk=prof.id)
 
 
 # Race Views
 class RaceDetailView(DetailView):
-    model = models.EntityProfession
+    model = models.EntityRace
     template_name = 'race/race_detail.html'
 
 
 class RaceListView(ListView):
-    model = models.EntityProfession
+    model = models.EntityRace
     template_name = 'race/race_list.html'
 
 
 class RaceInputFormView(AutoCreatedByView):
     form_class = forms.RaceInputForm
-    success_url = reverse_lazy('ui_races')
 
     def form_valid(self, form):
-        pass
+        race = form.create_race(created_by=self.request.user)
+        return redirect('ui_race_detail', pk=race.id)
 
 
 # Name/Language Views

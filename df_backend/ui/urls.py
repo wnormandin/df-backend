@@ -16,8 +16,8 @@ urlpatterns = [
     path(r'races/new', views.RaceInputFormView.as_view(), name='ui_races_new'),
     path(r'races', views.RaceListView.as_view(), name='ui_races'),
     path(r'races/<int:pk>', views.RaceDetailView.as_view(), name='ui_race_detail'),
-    path(r'professions', views.RaceListView.as_view(), name='ui_professions'),
-    path(r'professions/<int:pk>', views.RaceDetailView.as_view(), name='ui_profession_detail'),
+    path(r'professions', views.ProfessionListView.as_view(), name='ui_professions'),
+    path(r'professions/<int:pk>', views.ProfessionDetailView.as_view(), name='ui_profession_detail'),
     path(r'factions', views.FactionListView.as_view(), name='ui_factions'),
     path(r'factions/<int:pk>', views.FactionDetailView.as_view(), name='ui_faction_detail'),
 ]

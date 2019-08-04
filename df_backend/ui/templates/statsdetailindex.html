@@ -1,0 +1,128 @@
+ {% extends "detailindex.html" %}
+
+{% block stats_detail %}
+    <h4>Vitals</h4>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-utensils"></i>
+        Food: {{ object.stats.food }}
+    </button>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-wine-bottle"></i>
+        Drink: {{ object.stats.drink }}
+    </button>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-dumbbell"></i>
+        Stamina: {{ object.stats.stamina }}
+    </button>
+
+    <hr>
+    <h4>Core Stats</h4>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-fist-raised"></i>
+        Toughness: {{ object.stats.toughness }}
+    </button>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-fast-forward"></i>
+        Agility: {{ object.stats.agility }}
+    </button>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-cogs"></i>
+        Dexterity: {{ object.stats.dexterity }}
+    </button>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-graduation-cap"></i>
+        Intelligence: {{ object.stats.intelligence }}
+    </button>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-hat-wizard"></i>
+        Wisdom: {{ object.stats.wisdom }}
+    </button>
+
+    <hr>
+    <h4>Social</h4>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-camera"></i>
+        Charm: {{ object.stats.charm }}
+    </button>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-headphones"></i>
+        Persuasion: {{ object.stats.persuasion }}
+    </button>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-comment-slash"></i>
+        Introversion: {{ object.stats.introversion }}
+    </button>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-drafting-compass"></i>
+        Stability: {{ object.stats.stability }}
+    </button>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-smile-wink"></i>
+        Friendliness: {{ object.stats.friendliness }}
+    </button>
+
+    <hr>
+    <h4>Resists</h4>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-fire"></i>
+        Elements: {{ object.stats.elements }}
+    </button>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-fist-raised"></i>
+        Physical: {{ object.stats.physical }}
+    </button>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-magic"></i>
+        Magic: {{ object.stats.magic }}
+    </button>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-drumstick-bite"></i>
+        Hunger: {{ object.stats.hunger }}
+    </button>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-wine-glass-alt"></i>
+        Thirst: {{ object.stats.thirst }}
+    </button>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-bed"></i>
+        Exhaustion: {{ object.stats.exhaustion }}
+    </button>
+
+    <hr>
+    <h4>Mental</h4>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-flushed"></i>
+        Stress: {{ object.stats.stress }}
+    </button>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-grin-beam"></i>
+        Happiness: {{ object.stats.happiness }}
+    </button>
+
+    <button type="button" class="btn btn-secondary btn-lg">
+        <i class="fa fa-capsules"></i>
+        Addiction: {{ object.stats.addiction }}
+    </button>
+
+{% endblock %}

@@ -1,4 +1,4 @@
-{% extends "detailindex.html" %}
+{% extends "statsdetailindex.html" %}
 
 {% block detail_title %}
     {% if object.deleted %}
@@ -19,5 +19,6 @@
     <p>Last modified {{ object.modified_at|date }}</p>
 {% endblock %}
 
+{% block stats_title %}Stat Modifiers{% endblock %}
 {% block create_url %}{% url 'ui_professions_new' %}{% endblock %}
 {% block list_url %}{% url 'ui_professions' %}{% endblock %}

@@ -8,6 +8,13 @@
         <p>
         {% block detail %}{% endblock %}
         </p>
+
+        {% if object.stats %}
+            <hr>
+            <h4>{% block stats_title %}{% endblock %}</h4>
+            <p>{% block stats_detail %}{% endblock %}</p>
+        {% endif %}
+
         <hr>
         <p class="form-group">
         <a class="btn btn-primary btn-lg" href={% block create_url %}{% endblock %}>Create</a>
