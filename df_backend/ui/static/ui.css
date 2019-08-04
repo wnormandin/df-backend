@@ -1,0 +1,18 @@
+h1 a, h2 a {
+    color: #057319;
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: blue;
+  color: gray;
+  text-align: center;
+}
+
+.content {
+    margin-left: 40px;
+}
+

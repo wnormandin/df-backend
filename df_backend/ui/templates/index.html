@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+<!--
+Blocks:
+    * page
+        * head
+            * title
+        * header
+        * body
+            * sidebar
+            * content
+        * footer
+-->
+
+{% block header %}
+    {% if user.is_authenticated %}
+        <div class="alert alert-light" role="alert">
+            Welcome, {{ user.username }}!
+        </div>
+    {% endif %}
+{% endblock %}
+
+
+{% block navbar %}
+
+    <div class="nav-item">
+        <a class="nav-link" href="/api/">API</a>
+    </div>
+    <div class="nav-item">
+        <a class="nav-link" href="{% url 'ui_index' %}">Home</a>
+    </div>
+    <div class="nav-item">
+        <a class="nav-link" href="{% url 'ui_races' %}">Races</a>
+    </div>
+    <div class="nav-item">
+        <a class="nav-link" href="{% url 'ui_professions' %}">Professions</a>
+    </div>
+    <div class="nav-item">
+        <a class="nav-link" href="{% url 'ui_factions' %}">Factions</a>
+    </div>
+
+    {% if user.is_staff %}
+
+        <div class="nav-item dropdown">
+            <button class="btn btn-secondary dropdown-toggle" id="logDropDown" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Server Logs
+            </button>
+            <div class="dropdown-menu" aria-labelledby="logDropDown">
+                <a class="dropdown-item" href="{% url 'ui_logs_new' %}">Logs</a>
+                <a class="dropdown-item" href="{% url 'ui_logtypes_new' %}">Log Types</a>
+            </div>
+        </div>
+
+        <div class="nav-item dropdown">
+            <button class="btn btn-secondary dropdown-toggle" id="nameDropDown" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Name/Language
+            </button>
+            <div class="dropdown-menu" aria-labelledby="nameDropDown">
+                <a class="dropdown-item" href="{% url 'ui_names_new' %}">Names</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'ui_namelangs_new' %}">Languages</a>
+                <a class="dropdown-item" href="{% url 'ui_domains_new' %}">Domains</a>
+            </div>
+        </div>
+
+    {% endif %}
+
+{%  endblock %}

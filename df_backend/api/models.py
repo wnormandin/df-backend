@@ -314,3 +314,26 @@ class StatModifiers(CreationTrackingModel):
 
     def __str__(self):
         return self.name.title()
+
+
+class LogType(CreationTrackingModel):
+    name = models.CharField(max_length=15)
+    description = models.CharField(max_length=1000)
+
+
+class ServerLog(CreationTrackingModel):
+    message = models.CharField(max_length=1000)
+
+    # Potential relationships
+    player = models.ForeignKey(User, models.SET_NULL, null=True, related_name='logs')
+    game = models.ForeignKey(Game, models.SET_NULL, null=True)
+    game_map = models.ForeignKey(GameMap, models.SET_NULL, null=True)
+    entity = models.ForeignKey(GameEntity, models.SET_NULL, null=True)
+    race = models.ForeignKey(EntityRace, models.SET_NULL, null=True)
+    profession = models.ForeignKey(EntityProfession, models.SET_NULL, null=True)
+
+    # Log Message Metadata
+    logtype = models.ForeignKey(LogType, models.SET_NULL, related_name='logs', null=True)
+    context = models.CharField(max_length=1000)
+    remote_addr = models.GenericIPAddressField(null=True)
+    err_host = models.GenericIPAddressField(null=True)

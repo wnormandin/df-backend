@@ -1,0 +1,10 @@
+{% extends "listindex.html" %}
+
+{% block title %}Faction List{% endblock %}
+
+{% block innerlist %}
+    <b><a href="{% url 'ui_faction_detail' pk=obj.id %}">{{ obj.name }}</a></b>:
+    {{ obj.description }} (Created {{ obj.created_at|date }} by {{ obj.created_by.username }})
+{% endblock %}
+
+{% block create_url %}{% url 'ui_factions_new' %}{% endblock %}

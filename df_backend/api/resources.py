@@ -4,9 +4,10 @@ import logging
 import random
 import requests
 from collections import OrderedDict
+from django.contrib.auth.models import User, Group
 
 from . import models, serializers
-from .. import exc
+from .. import exc, utils
 
 
 logger = logging.getLogger(__name__)
@@ -54,11 +55,30 @@ class NameDescriptor:
 def register_user(username, password, email, first_name=None, last_name=None):
     """ Basic user registration, creates a game/game map by default """
 
-
+    # Create our user and add them to the player group
+    user = User.objects.create_user(username, email=email, password=password,
+                                    first_name=first_name, last_name=last_name)
+    user.groups.add(get_player_group())
 
 
 def roll(d=0.5):
     return random.random() > (1-d)
+
+
+def get_user_by_username(username):
+    return User.objects.get_by_natural_key(username)
+
+
+def get_group_by_name(groupname):
+    return Group.objects.filter(name=groupname).first()
+
+
+def get_player_group():
+    return get_group_by_name(utils.constants.DF_PLAYER_GROUP)
+
+
+def get_system_user():
+    return get_user_by_username(utils.constants.DF_SYSTEM_USER)
 
 
 def generate_multiple_names(count, genders=None, max_length=50, max_tries=100):

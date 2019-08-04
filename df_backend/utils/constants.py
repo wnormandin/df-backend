@@ -19,3 +19,6 @@ EMAIL_DATA_DIR = os.path.join(DATA_DIR, 'email')
 LOG_DATA_DIR = os.path.join(DATA_DIR, 'logs')
 LOG_LEVEL = int(os.environ.get('DF_LOG_LEVEL', 10))
 GENDER_CHOICES = [('male', 'Male'), ('female', 'Female'), ('neutral', 'Neutral')]
+
+DF_SYSTEM_USER = 'system'
+DF_PLAYER_GROUP = 'player'

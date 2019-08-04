@@ -4,6 +4,54 @@ from django_select2.forms import Select2MultipleWidget
 from ..api import models
 
 
+class EntityFactionForm(forms.ModelForm):
+    class Meta:
+        model = models.EntityFaction
+        exclude = ('created_by',)
+
+
+class NamePartForm(forms.ModelForm):
+    class Meta:
+        model = models.NamePart
+        exclude = ('created_by',)
+
+
+class NameLanguageForm(forms.ModelForm):
+    class Meta:
+        model = models.NameLanguage
+        exclude = ('created_by',)
+
+
+class NameEraForm(forms.ModelForm):
+    class Meta:
+        model = models.NameEra
+        exclude = ('created_by',)
+
+
+class NameDomainForm(forms.ModelForm):
+    class Meta:
+        model = models.NameDomain
+        exclude = ('created_by',)
+
+
+class StatModifiersForm(forms.ModelForm):
+    class Meta:
+        model = models.StatModifiers
+        exclude = ('created_by',)
+
+
+class LogTypeForm(forms.ModelForm):
+    class Meta:
+        model = models.LogType
+        exclude = ('created_by',)
+
+
+class ServerLogForm(forms.ModelForm):
+    class Meta:
+        model = models.ServerLog
+        exclude = ('created_by',)
+
+
 class RaceForm(forms.Form):
     name = forms.CharField(label='Race Name', max_length=100)
     description = forms.CharField(label='Race Description', max_length=1000, widget=forms.Textarea)
@@ -16,6 +64,7 @@ class ProfessionForm(forms.Form):
                                            widget=Select2MultipleWidget)
 
 
+# Non-model form for linked input (e.g. during entity creation)
 class StatForm(forms.Form):
     food = forms.IntegerField(label='Food', min_value=0, max_value=255)
     drink = forms.IntegerField(label='Drink', min_value=0, max_value=255)
@@ -42,8 +91,6 @@ class StatForm(forms.Form):
 
 
 class StatModForm(forms.Form):
-    name = forms.CharField(label='Modifiers Name', max_length=100)
-    description = forms.CharField(label='Modifiers Description', max_length=1000, widget=forms.Textarea)
     food = forms.IntegerField(label='Food modifier', min_value=-100, max_value=100)
     drink = forms.IntegerField(label='Drink modifier', min_value=-100, max_value=100)
     stamina = forms.IntegerField(label='Stamina modifier', min_value=-100, max_value=100)
@@ -71,7 +118,18 @@ class StatModForm(forms.Form):
 class RaceInputForm(RaceForm, StatModForm):
     """ Form encapsulating inputs for a new race """
 
+    def create_race(self):
+        pass
+
+    def edit_race(self):
+        pass
+
 
 class ProfessionInputForm(ProfessionForm, StatModForm):
     """ Form encapsulating inputs for a new profession """
 
+    def create_profession(self):
+        pass
+
+    def edit_race(self):
+        pass

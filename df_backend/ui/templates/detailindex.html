@@ -1,0 +1,17 @@
+{% extends "index.html" %}
+
+{% block content %}
+    <div class="jumbotron">
+        <h2 class="display-4">{% block detail_title %}{% endblock %}</h2>
+        <p class="lead">{% block detail_subheading %}{% endblock %}</p>
+        <hr class="my-4">
+        <p>
+        {% block detail %}{% endblock %}
+        </p>
+        <hr>
+        <p class="form-group">
+        <a class="btn btn-primary btn-lg" href={% block create_url %}{% endblock %}>Create</a>
+        <a class="btn btn-primary btn-lg" href={% block list_url %}{% endblock %}>List All</a>
+        </p>
+    </div>
+{% endblock %}

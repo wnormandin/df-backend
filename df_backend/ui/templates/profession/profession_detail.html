@@ -1,0 +1,23 @@
+{% extends "detailindex.html" %}
+
+{% block detail_title %}
+    {% if object.deleted %}
+        <p style="color: red">
+    {% else %}
+        <p>
+    {% endif %}
+
+    Profession: {{ object.name }}{% if object.deleted %} (Deleted){% endif %}
+    </p>
+{% endblock %}
+
+{% block detail_subheading %}{{ object.description }}{% endblock %}
+
+{% block detail %}
+    <p>Created by {{ object.created_by.username }}</p>
+    <p>Created on {{ object.created_at|date }}</p>
+    <p>Last modified {{ object.modified_at|date }}</p>
+{% endblock %}
+
+{% block create_url %}{% url 'ui_professions_new' %}{% endblock %}
+{% block list_url %}{% url 'ui_professions' %}{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "listindex.html" %}
+
+{% block title %}Race List{% endblock %}
+
+{% block innerlist %}
+    <b><a href="{% url 'ui_race_detail' pk=obj.id %}">{{ obj.name }}</a></b>:
+    {{ obj.description }} (Created {{ obj.created_at|date }} by {{ obj.created_by.username }})
+{% endblock %}
+
+{% block create_url %}{% url 'ui_races_new' %}{% endblock %}

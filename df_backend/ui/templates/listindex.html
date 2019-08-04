@@ -1,0 +1,17 @@
+{% extends "index.html" %}
+
+{% block content %}
+    <ul class="list-group">
+    {% for obj in object_list %}
+        <li class="list-group-item">
+        {% block innerlist %}{% endblock %}
+        </li>
+    {% empty %}
+        <li class="list-groupitem">No items found</li>
+    {% endfor %}
+    </ul>
+    <hr>
+    <p class="form-group">
+    <a class="btn btn-primary btn-lg" href={% block create_url %}{% endblock %}>Create</a>
+    </p>
+{% endblock %}
