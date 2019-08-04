@@ -9,13 +9,38 @@ from ..utils.constants import GENDER_CHOICES
 logger = logging.getLogger(__name__)
 
 
+class NameDomain(models.Model):
+    """ reality, lotr, general fantasy, etc """
+
+    name = models.CharField(max_length=15, unique=True)
+    description = models.CharField(max_length=1000)
+
+
+class NameLanguage(models.Model):
+    """ Etymological name language """
+
+    name = models.CharField(max_length=25, unique=True)
+    description = models.CharField(max_length=1000)
+
+
+class NameEra(models.Model):
+    name = models.CharField(max_length=15, unique=True)
+    description = models.CharField(max_length=1000)
+
+    domain = models.ForeignKey(NameDomain, models.DO_NOTHING, related_name='eras', null=True)
+
+
 class NamePart(models.Model):
     value = models.CharField(max_length=15)
+
     paternal = models.BooleanField(default=False)
     maternal = models.BooleanField(default=False)
     prefix = models.BooleanField(default=False)
     suffix = models.BooleanField(default=False)
+
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default='neutral')
+    era = models.ForeignKey(NameEra, models.DO_NOTHING, related_name='names', null=True)
+    language = models.ForeignKey(NameLanguage, models.DO_NOTHING, related_name='names', null=True)
 
     @classmethod
     def get_part(cls, target=None, gender='neutral'):
@@ -31,6 +56,14 @@ class NamePart(models.Model):
 
         targets = cls.objects.filter(**filter_kwargs).all()
         return random.choice(list(targets)) if targets else None
+
+    def __str__(self):
+        return f'{self.value} ({self.gender} {self.desc.value + " " if self.desc else ""}name)'
+
+    @property
+    def desc(self):
+        from .resources import NameDescriptor
+        return NameDescriptor.from_instance(self)
 
 
 class Game(models.Model):

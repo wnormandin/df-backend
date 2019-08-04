@@ -5,10 +5,50 @@ import random
 import requests
 from collections import OrderedDict
 
-from . import models
+from . import models, serializers
+from ..exc import InvalidProfessionSelection
 
 
 logger = logging.getLogger(__name__)
+
+
+class NameDescriptor:
+    @classmethod
+    def from_instance(cls, instance):
+        return cls(**serializers.NamePartSerializer(instance).data)
+
+    def __init__(self, paternal, maternal, prefix, suffix, **kwargs):
+        self.paternal = paternal
+        self.maternal = maternal
+        self.prefix = prefix
+        self.suffix = suffix
+
+    def __bool__(self):
+        return self.has_flags
+
+    @property
+    def core_flags(self):
+        return self.paternal, self.maternal, self.prefix, self.suffix
+
+    @property
+    def has_flags(self):
+        return any(self.core_flags)
+
+    @property
+    def value(self):
+        parts = []
+        if self.paternal:
+            parts.append('pat')
+        if self.maternal:
+            parts.append('mat')
+        if self.prefix:
+            parts.append('pre')
+        if self.suffix:
+            parts.append('suf')
+
+        if not parts:
+            return
+        return '[' + '|'.join(parts) + ']'
 
 
 def roll(d=0.5):
@@ -84,4 +124,5 @@ def generate_entity(race, prof):
     if not isinstance(prof, models.EntityProfession):
         prof = models.EntityProfession.objects.get(name=prof)
 
-
+    if prof not in race.allowed_professions():
+        raise InvalidProfessionSelection(f'{race} may not be {prof}')

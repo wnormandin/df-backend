@@ -1,0 +1,9 @@
+#!/bin/bash
+
+. /.venv/scripts/activate
+export DF_DB_HOST=<db_host>
+export DF_DB_NAME=df_backend
+export DF_DB_PORT=3306
+export DF_DB_PASS=<db_pass>
+export DF_DB_USER=dunderfunk
+export DJANGO_SETTINGS_FILE=df_backend.settings
