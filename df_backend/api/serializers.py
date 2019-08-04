@@ -4,6 +4,11 @@ from django.contrib.auth.models import User
 from . import models
 
 
+class RandomNameRequestSerializer(serializers.Serializer):
+    count = serializers.IntegerField(default=1)
+    genders = serializers.JSONField(required=False)
+
+
 class StatSerializer(serializers.Serializer):
     name = serializers.CharField(required=False, max_length=50)
     description = serializers.CharField(required=False, max_length=1000)
@@ -40,10 +45,41 @@ class StatSerializer(serializers.Serializer):
     addiction = serializers.IntegerField()
 
 
+class NewUserSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=50)
+    password = serializers.CharField(max_length=254)
+    email = serializers.EmailField()
+    first_name = serializers.CharField(max_length=254, required=False)
+    last_name = serializers.CharField(max_length=254, required=False)
+
+
+class NameLanguageSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=254)
+    description = serializers.CharField(max_length=1000)
+
+
+class NameDomainSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=254)
+    description = serializers.CharField(max_length=1000)
+
+
+class NameEraSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=254)
+    description = serializers.CharField(max_length=1000)
+
+    domain = NameDomainSerializer(required=False)
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         exclude = ['password']
+
+
+class NamePartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.NamePart
+        fields = '__all__'
 
 
 class RaceSerializer(serializers.ModelSerializer):

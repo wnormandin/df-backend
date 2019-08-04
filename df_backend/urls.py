@@ -19,10 +19,12 @@ from django.urls import include, path
 from rest_framework.authtoken.views import obtain_auth_token
 
 from .api.urls import urlpatterns as api_urls
+from .ui.urls import urlpatterns as ui_urls
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-token', obtain_auth_token),
-    path('api/', include(api_urls))
+    path('api/', include(api_urls)),
+    path('ui/', include(ui_urls))
 ]

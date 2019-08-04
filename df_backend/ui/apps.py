@@ -1,8 +1,8 @@
 from django.apps import AppConfig
 
 
-class ApiConfig(AppConfig):
-    name = 'api'
+class UiConfig(AppConfig):
+    name = 'ui'
 
     def ready(self):
         from ..utils import setup_logging

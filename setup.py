@@ -7,7 +7,10 @@ setup(
     install_requires=[
         'click',
         'django',
-        'django-rest-framework',
+        'djangorestframework',
+        'django-filter',
+        'markdown',
+        'requests',
         'waitress'
         ],
     author='William Normandin',
@@ -15,5 +18,6 @@ setup(
     packages=find_packages(),
     license='MIT',
     description='Backend API for the DunderFunk game client',
-    entry_points={'console_scripts': ['df-api=df_backend.cli:cli']}
+    entry_points={'console_scripts': ['df-api=df_backend.cli:cli']},
+    include_package_data=True
     )

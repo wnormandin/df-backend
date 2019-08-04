@@ -2,33 +2,129 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
 import logging
+import random
 
+from ..utils.constants import GENDER_CHOICES
 
 logger = logging.getLogger(__name__)
 
 
-class Game(models.Model):
-    player = models.ForeignKey(User, models.DO_NOTHING, related_name='games')
+class CreationTrackingModel(models.Model):
+    """ Model base including mechanism to track creation time / user for each record """
+
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+    deleted = models.BooleanField(default=False)
+
+    class Meta:
+        abstract = True
+
+    def mark_deleted(self):
+        self.deleted = True
+
+
+class NameDomain(CreationTrackingModel):
+    """ reality, lotr, general fantasy, etc """
+
+    name = models.CharField(max_length=15, unique=True)
+    description = models.CharField(max_length=1000)
+
+    def __str__(self):
+        return self.name.title()
+
+
+class NameLanguage(CreationTrackingModel):
+    """ Etymological name language """
+
+    name = models.CharField(max_length=25, unique=True)
+    description = models.CharField(max_length=1000)
+
+    def __str__(self):
+        return self.name.title()
+
+
+class NameEra(CreationTrackingModel):
+    name = models.CharField(max_length=15, unique=True)
+    description = models.CharField(max_length=1000)
+
+    domain = models.ForeignKey(NameDomain, models.CASCADE, related_name='eras', null=True)
+
+    def __str__(self):
+        return self.name.title()
+
+
+class NamePart(CreationTrackingModel):
+    value = models.CharField(max_length=15)
+
+    paternal = models.BooleanField(default=False)
+    maternal = models.BooleanField(default=False)
+    prefix = models.BooleanField(default=False)
+    suffix = models.BooleanField(default=False)
+
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default='neutral')
+    era = models.ForeignKey(NameEra, models.CASCADE, related_name='names', null=True)
+    language = models.ForeignKey(NameLanguage, models.CASCADE, related_name='names', null=True)
+
+    @classmethod
+    def get_part(cls, target=None, gender='neutral'):
+        filter_kwargs = dict(paternal=False, maternal=False, prefix=False, suffix=False)
+        filter_kwargs['gender__in'] = {gender, 'neutral'}
+
+        if target is not None:
+            filter_kwargs[target] = True
+        if target == 'paternal':
+            filter_kwargs.pop('maternal')
+        elif target == 'maternal':
+            filter_kwargs.pop('paternal')
+
+        targets = cls.objects.filter(**filter_kwargs).all()
+        return random.choice(list(targets)) if targets else None
+
+    def __str__(self):
+        return f'{self.value} ({self.gender} {self.desc.value + " " if self.desc else ""}name)'
+
+    @property
+    def desc(self):
+        from .resources import NameDescriptor
+        return NameDescriptor.from_instance(self)
+
+
+class Game(CreationTrackingModel):
+    player = models.ForeignKey(User, models.CASCADE, related_name='games')
     created_at = models.DateTimeField(default=datetime.utcnow)
 
+    def __str__(self):
+        return f'{self.player} game {self.id}'
 
-class GameMap(models.Model):
-    game = models.ForeignKey(Game, models.DO_NOTHING)
+
+class GameMap(CreationTrackingModel):
+    game = models.ForeignKey(Game, models.CASCADE)
     created_at = models.DateTimeField(default=datetime.utcnow)
 
+    def __str__(self):
+        return f'{self.game} map {self.id}'
 
-# Create your models here.
-class GameEntity(models.Model):
+
+class GameEntity(CreationTrackingModel):
     name = models.CharField(max_length=50)
     level = models.IntegerField(default=1)
     alive = models.BooleanField(default=True)
     active = models.BooleanField(default=True)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default='neutral')
 
-    profession = models.ForeignKey('EntityProfession', models.DO_NOTHING)
-    race = models.ForeignKey('EntityRace', models.DO_NOTHING)
-    stats = models.ForeignKey('EntityStats', models.DO_NOTHING)
-    location = models.ForeignKey('EntityLocation', models.DO_NOTHING)
-    game_map = models.ForeignKey(GameMap, models.DO_NOTHING)
+    profession = models.ForeignKey('EntityProfession', models.CASCADE)
+    race = models.ForeignKey('EntityRace', models.CASCADE)
+    stats = models.ForeignKey('EntityStats', models.CASCADE)
+    location = models.ForeignKey('EntityLocation', models.CASCADE)
+    game_map = models.ForeignKey(GameMap, models.CASCADE)
+
+    @classmethod
+    def generate_entity(cls, name, gender, race, profession):
+        entity = cls.objects.create(name=name, gender=gender)
+
+    def __str__(self):
+        return f'{self.name.title()} (lvl {self.level} {self.race} {self.profession})'
 
     def get_faction_scores(self):
         output = {}
@@ -64,7 +160,7 @@ class GameEntity(models.Model):
         self.location.z = z
 
 
-class EntityLocation(models.Model):
+class EntityLocation(CreationTrackingModel):
     x = models.IntegerField(default=0)
     y = models.IntegerField(default=0)
     z = models.IntegerField(default=0)
@@ -72,48 +168,63 @@ class EntityLocation(models.Model):
     def position(self):
         return self.x, self.y, self.z
 
+    def __str__(self):
+        return f'({self.x},{self.y},{self.z})'
 
-class ProfessionRace(models.Model):
-    profession = models.ForeignKey('EntityProfession', models.DO_NOTHING,
+
+class ProfessionRace(CreationTrackingModel):
+    profession = models.ForeignKey('EntityProfession', models.CASCADE,
                                    related_name='races')
-    race = models.ForeignKey('EntityRace', models.DO_NOTHING)
+    race = models.ForeignKey('EntityRace', models.CASCADE, related_name='professions')
 
     class Meta:
         unique_together = [['profession', 'race']]
 
 
-class EntityProfession(models.Model):
+class EntityProfession(CreationTrackingModel):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=1000)
 
-    stats = models.ForeignKey('StatModifiers', models.DO_NOTHING)
+    stats = models.ForeignKey('StatModifiers', models.CASCADE)
+
+    def __str__(self):
+        return self.name.title()
 
     def allowed_races(self):
         return [rel.race for rel in self.races.get()]
 
 
-class EntityRace(models.Model):
+class EntityRace(CreationTrackingModel):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=1000)
 
-    stats = models.ForeignKey('StatModifiers', models.DO_NOTHING)
+    stats = models.ForeignKey('StatModifiers', models.CASCADE)
+
+    def __str__(self):
+        return self.name.title()
+
+    def allowed_professions(self):
+        return [rel.profession for rel in self.professions.get()]
 
 
-class FactionScore(models.Model):
-    entity = models.ForeignKey(GameEntity, models.DO_NOTHING)
-    faction = models.ForeignKey('EntityFaction', models.DO_NOTHING)
+class FactionScore(CreationTrackingModel):
+    entity = models.ForeignKey(GameEntity, models.CASCADE)
+    faction = models.ForeignKey('EntityFaction', models.CASCADE)
     value = models.IntegerField(default=0)
 
     class Meta:
         unique_together = [['entity', 'faction']]
 
 
-class EntityFaction(models.Model):
+class EntityFaction(CreationTrackingModel):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=1000)
 
+    def __str__(self):
+        return self.name.title()
 
-class EntityStats(models.Model):
+
+class EntityStats(CreationTrackingModel):
     food = models.IntegerField(default=100)
     drink = models.IntegerField(default=100)
     stamina = models.IntegerField(default=100)
@@ -162,7 +273,7 @@ class EntityStats(models.Model):
         return serializers.StatSerializer(self).data
 
 
-class StatModifiers(models.Model):
+class StatModifiers(CreationTrackingModel):
     name = models.CharField(max_length=50)
     description = models.CharField(max_length=1000)
 
@@ -200,3 +311,29 @@ class StatModifiers(models.Model):
     def serialize(self):
         from . import serializers
         return serializers.StatSerializer(self).data
+
+    def __str__(self):
+        return self.name.title()
+
+
+class LogType(CreationTrackingModel):
+    name = models.CharField(max_length=15)
+    description = models.CharField(max_length=1000)
+
+
+class ServerLog(CreationTrackingModel):
+    message = models.CharField(max_length=1000)
+
+    # Potential relationships
+    player = models.ForeignKey(User, models.SET_NULL, null=True, related_name='logs')
+    game = models.ForeignKey(Game, models.SET_NULL, null=True)
+    game_map = models.ForeignKey(GameMap, models.SET_NULL, null=True)
+    entity = models.ForeignKey(GameEntity, models.SET_NULL, null=True)
+    race = models.ForeignKey(EntityRace, models.SET_NULL, null=True)
+    profession = models.ForeignKey(EntityProfession, models.SET_NULL, null=True)
+
+    # Log Message Metadata
+    logtype = models.ForeignKey(LogType, models.SET_NULL, related_name='logs', null=True)
+    context = models.CharField(max_length=1000)
+    remote_addr = models.GenericIPAddressField(null=True)
+    err_host = models.GenericIPAddressField(null=True)
