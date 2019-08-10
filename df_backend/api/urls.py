@@ -33,6 +33,6 @@ urlpatterns = [
     path(r'factions', views.FactionList.as_view()),
     path(r'entities', views.EntityList.as_view()),
     path(r'api-auth', include('rest_framework.urls', namespace='rest_framework')),
-    path(r'name', include(name_patterns)),
-    path(r'generate', include(generate_patterns))
+    path(r'name/', include(name_patterns)),
+    path(r'generate/', include(generate_patterns))
 ]

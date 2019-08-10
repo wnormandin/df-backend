@@ -144,7 +144,7 @@ def load_names_from_url(url, max_count=2000, **kwargs):
     return count
 
 
-def generate_entity(gender, race, prof):
+def generate_entity(gender, race, prof, created_by=None, game_map=None):
     if not isinstance(race, models.EntityRace):
         race = models.EntityRace.objects.get(name=race)
     if not isinstance(prof, models.EntityProfession):
@@ -157,3 +157,9 @@ def generate_entity(gender, race, prof):
         raise exc.InvalidGender(f'Unknown gender: {gender}')
 
     entity_name = generate_name(gender=gender)
+    return models.GameEntity.generate_entity(entity_name, gender=gender, race=race, profession=prof,
+                                             created_by=created_by or get_system_user(), game_map=game_map)
+
+
+def server_log(message, created_by=None, **kwargs):
+    return models.ServerLog.objects.create(message=message, created_by=created_by, **kwargs).id

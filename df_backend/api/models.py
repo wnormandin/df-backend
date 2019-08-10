@@ -113,24 +113,33 @@ class GameEntity(CreationTrackingModel):
     active = models.BooleanField(default=True)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default='neutral')
 
-    profession = models.ForeignKey('EntityProfession', models.CASCADE)
-    race = models.ForeignKey('EntityRace', models.CASCADE)
-    stats = models.ForeignKey('EntityStats', models.CASCADE)
+    profession = models.ForeignKey('EntityProfession', models.CASCADE, null=True)
+    race = models.ForeignKey('EntityRace', models.CASCADE, null=True)
+    stats = models.ForeignKey('EntityStats', models.CASCADE, null=True)
     location = models.ForeignKey('EntityLocation', models.CASCADE)
-    game_map = models.ForeignKey(GameMap, models.CASCADE)
+    game_map = models.ForeignKey(GameMap, models.CASCADE, null=True)
 
     @classmethod
-    def generate_entity(cls, name, gender, race, profession):
-        entity = cls.objects.create(name=name, gender=gender)
+    def generate_entity(cls, name, gender, race, profession, created_by, game_map=None):
+
+        pos = EntityLocation.objects.create(created_by=created_by)
+        stats = EntityStats.objects.create(created_by=created_by)
+
+        entity = cls.objects.create(name=name, gender=gender, created_by=created_by,
+                                    location=pos, stats=stats, game_map=game_map)
+
+        entity.select_race(race)
+        entity.select_profession(profession)
+
+        return entity
 
     def __str__(self):
         return f'{self.name.title()} (lvl {self.level} {self.race} {self.profession})'
 
     def get_faction_scores(self):
         output = {}
-        for rel in EntityFaction.objects.filter(entity=self):
-            score = FactionScore.objects.get(entity=self, faction=rel.faction)
-            output[rel.faction.name] = score.value
+        for rel in FactionScore.objects.filter(entity=self):
+            output[rel.faction.name] = rel.value
         return output
 
     def initialize_factions(self):
@@ -148,7 +157,7 @@ class GameEntity(CreationTrackingModel):
 
     def select_profession(self, profession):
         assert self.race is not None
-        assert self.race in profession.allowed_races
+        assert self.race in profession.allowed_races()
 
         self.profession = profession
         self.stats.apply_modifiers(profession.stats)
@@ -191,7 +200,10 @@ class EntityProfession(CreationTrackingModel):
         return self.name.title()
 
     def allowed_races(self):
-        return [rel.race for rel in self.races.get()]
+        races = self.races.get()
+        if isinstance(races, list):
+            return [rel.race for rel in self.races.get()]
+        return [races.race]
 
 
 class EntityRace(CreationTrackingModel):
@@ -204,7 +216,10 @@ class EntityRace(CreationTrackingModel):
         return self.name.title()
 
     def allowed_professions(self):
-        return [rel.profession for rel in self.professions.get()]
+        professions = self.professions.get()
+        if isinstance(professions, list):
+            return [rel.profession for rel in professions]
+        return [professions.profession]
 
 
 class FactionScore(CreationTrackingModel):
@@ -229,19 +244,24 @@ class EntityStats(CreationTrackingModel):
     drink = models.IntegerField(default=100)
     stamina = models.IntegerField(default=100)
 
+    # Mental attributes
+    stress = models.IntegerField(default=100)
+    happiness = models.IntegerField(default=100)
+    addiction = models.IntegerField(default=100)
+
     # Core
-    toughness = models.IntegerField(default=1)
-    agility = models.IntegerField(default=1)
-    dexterity = models.IntegerField(default=1)
-    intelligence = models.IntegerField(default=1)
-    wisdom = models.IntegerField(default=1)
+    toughness = models.IntegerField(default=0)
+    agility = models.IntegerField(default=0)
+    dexterity = models.IntegerField(default=0)
+    intelligence = models.IntegerField(default=0)
+    wisdom = models.IntegerField(default=0)
 
     # Social
-    charm = models.IntegerField(default=1)
-    persuasion = models.IntegerField(default=1)
-    introversion = models.IntegerField(default=1)
-    stability = models.IntegerField(default=1)
-    friendliness = models.IntegerField(default=1)
+    charm = models.IntegerField(default=0)
+    persuasion = models.IntegerField(default=0)
+    introversion = models.IntegerField(default=0)
+    stability = models.IntegerField(default=0)
+    friendliness = models.IntegerField(default=0)
 
     # Resists
     elements = models.IntegerField(default=0)
@@ -251,11 +271,6 @@ class EntityStats(CreationTrackingModel):
     thirst = models.IntegerField(default=0)
     exhaustion = models.IntegerField(default=0)
 
-    # Mental attributes
-    stress = models.IntegerField(default=100)
-    happiness = models.IntegerField(default=100)
-    addiction = models.IntegerField(default=100)
-
     def apply_modifiers(self, modifiers):
 
         for key, value in modifiers.serialize().items():
@@ -264,7 +279,6 @@ class EntityStats(CreationTrackingModel):
 
             logger.debug(f'Changing stat {key} by {value}')
             setattr(self, key, getattr(self, key) + value)
-            logger.debug(f'New value: {getattr(self, key)}')
 
         self.save()
 
@@ -334,6 +348,6 @@ class ServerLog(CreationTrackingModel):
 
     # Log Message Metadata
     logtype = models.ForeignKey(LogType, models.SET_NULL, related_name='logs', null=True)
-    context = models.CharField(max_length=1000)
+    context = models.CharField(max_length=1000, null=True)
     remote_addr = models.GenericIPAddressField(null=True)
     err_host = models.GenericIPAddressField(null=True)
