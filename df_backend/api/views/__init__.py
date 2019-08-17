@@ -5,19 +5,28 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import DjangoModelPermissions, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.authtoken.models import Token
-from rest_framework.authtoken import serializers
+from rest_framework import status
+from django.contrib.auth.models import User
 
 from ..serializers import UserSerializer
 from df_backend import __version__ as api_version
 
 
 class UserLogin(APIView):
+    permission_classes = ()
+    authentication_classes = ()
+
     def post(self, request):
-        serializer = serializers.AuthTokenSerializer(data=request.data, context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
+        if 'username' not in request.data or 'password' not in request.data:
+            return Response({'error': 'Must provide "username" and "password" values'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.get_by_natural_key(request.data['username'])
+        if not user.check_password(request.data['password']):
+            return Response({'error': "Authentication failed"}, status=status.HTTP_401_UNAUTHORIZED)
+
         token, _ = Token.objects.get_or_create(user=user)
-        return Response({"token": token})
+        return Response({"token": token.key})
 
 
 class ModelListView(ListAPIView):
