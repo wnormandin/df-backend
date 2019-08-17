@@ -4,10 +4,20 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import DjangoModelPermissions, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
-
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 
 from ..serializers import UserSerializer
 from df_backend import __version__ as api_version
+
+
+class UserLogin(ObtainAuthToken):
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({"token": token})
 
 
 class ModelListView(ListAPIView):
@@ -36,7 +46,7 @@ class HeartBeatView(APIView):
         userdata = UserSerializer(request.user).data
 
         if not request.user.is_superuser:
-            targets = ['username', 'first_name', 'last_name', 'date_joined']
+            targets = ['username', 'first_name', 'last_name', 'date_joined', 'email']
             userdata = {key: val for key, val in userdata.items() if key in targets}
 
         timestamp = datetime.timestamp(datetime.utcnow())
