@@ -5,10 +5,13 @@ from .. import serializers, resources
 
 
 class GetEntities(views.APIView):
-    def get(self):
+    def get(self, request):
         """ GET will fetch a single, random character """
 
-    def post(self):
+        entity = resources.generate_entity('male', 'TestHuman', 'TestWarrior', created_by=request.user)
+        return response.Response(serializers.EntitySerializer(entity).data)
+
+    def post(self, request):
         """ POST will allow multiple characters with options """
 
 
