@@ -129,6 +129,9 @@ class PositionSerializer(serializers.ModelSerializer):
 
 
 class EntitySerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=100)
+    level = serializers.IntegerField()
+
     stats = StatSerializer(required=False)
     race = RaceSerializer(required=False)
     profession = ProfessionSerializer(required=False)

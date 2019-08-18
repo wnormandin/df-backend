@@ -157,7 +157,7 @@ def generate_entity(gender, race, prof, created_by=None, game_map=None):
         raise exc.InvalidGender(f'Unknown gender: {gender}')
 
     entity_name = generate_name(gender=gender)
-    return models.GameEntity.generate_entity(entity_name, gender=gender, race=race, profession=prof,
+    return models.GameEntity.generate_entity(name=entity_name, gender=gender, race=race, profession=prof,
                                              created_by=created_by or get_system_user(), game_map=game_map)
 
 
